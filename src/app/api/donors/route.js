@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
-import { supabaseAdmin } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
-// GET - Search donors (all roles)
 export async function GET(request) {
   try {
     const user = await getCurrentUser();
@@ -13,76 +12,80 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const query = searchParams.get('query');
     const bloodType = searchParams.get('blood_type');
-    const district = searchParams.get('district');
+    const districtId = searchParams.get('district_id');
     const year = searchParams.get('year');
     const session = searchParams.get('session');
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
     const offset = (page - 1) * limit;
 
+    // Optimized select: remove donations (*) from list view unless filtering
+    let selectString = '*, districts:district_id (district_name)';
+    if (year || session) {
+      selectString += ', donations (*)';
+    }
+
     let supabaseQuery = supabaseAdmin
       .from('donors')
-      .select(`
-        *,
-        districts:district_id (district_name),
-        donations (*)
-      `, { count: 'exact' })
+      .select(selectString, { count: 'exact' })
       .eq('is_active', true);
 
-    // Apply filters
     if (query) {
-      supabaseQuery = supabaseQuery.or(
-        `first_name.ilike.%${query}%,last_name.ilike.%${query}%,phone_number.ilike.%${query}%`
-      );
+      // Split query by spaces to support multi-word search
+      const terms = query.trim().split(/\s+/);
+      const orConditions = terms.map(term => 
+        `first_name.ilike.%${term}%,last_name.ilike.%${term}%,phone_number.ilike.%${term}%,ssn.ilike.%${term}%,church.ilike.%${term}%,full_address.ilike.%${term}%`
+      ).join(',');
+      supabaseQuery = supabaseQuery.or(orConditions);
     }
+
     if (bloodType) {
       supabaseQuery = supabaseQuery.eq('blood_type', bloodType);
     }
-    if (district) {
-      supabaseQuery = supabaseQuery.eq('district_id', district);
+
+    if (districtId) {
+      supabaseQuery = supabaseQuery.eq('district_id', parseInt(districtId));
     }
 
-    // Filter by year/session if provided
-    if (year) {
-      supabaseQuery = supabaseQuery.not('donations', 'is', null);
-    }
-
-    supabaseQuery = supabaseQuery
-      .order('created_at', { ascending: false })
-      .range(offset, offset + limit - 1);
-
-    const { data: donors, error, count } = await supabaseQuery;
+    const { data: donors, error, count } = await supabaseQuery
+      .order('created_at', { ascending: false });
 
     if (error) throw error;
 
-    // Filter donations by year/session if needed
-    let filteredDonors = donors;
+    // Filter by year/session if specified (PostgREST filtering on joined tables can be tricky, 
+    // so we filter in JS for these optional fields)
+    let filteredDonors = donors || [];
     if (year || session) {
-      filteredDonors = donors.filter(donor => {
-        return donor.donations.some(donation => {
+      const targetYear = year ? parseInt(year) : null;
+      const targetSession = session ? parseInt(session) : null;
+      
+      filteredDonors = filteredDonors.filter(donor => 
+        donor.donations && donor.donations.some(d => {
           let match = true;
-          if (year) match = match && donation.donation_year === parseInt(year);
-          if (session) match = match && donation.donation_session === parseInt(session);
+          if (targetYear) match = match && d.donation_year === targetYear;
+          if (targetSession) match = match && d.donation_session === targetSession;
           return match;
-        });
-      });
+        })
+      );
     }
 
-    return NextResponse.json({
-      donors: filteredDonors,
-      total: count,
-      page,
-      totalPages: Math.ceil(count / limit),
+    // Apply manual range after JS filtering if necessary, but here we'll just return the results
+    // To be perfectly accurate with pagination + JS filtering, we'd need a more complex query,
+    // but for the current scale, this is a robust fix.
+    const paginatedDonors = filteredDonors.slice(offset, offset + limit);
+
+    return NextResponse.json({ 
+      donors: paginatedDonors, 
+      total: year || session ? filteredDonors.length : (count || 0), 
+      page, 
+      totalPages: Math.ceil((year || session ? filteredDonors.length : (count || 0)) / limit) 
     });
   } catch (error) {
-    return NextResponse.json(
-      { error: error.message },
-      { status: 500 }
-    );
+    console.error('Donor GET Error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
-// POST - Add new donor (super_user & admin only)
 export async function POST(request) {
   try {
     const user = await getCurrentUser();
@@ -91,89 +94,59 @@ export async function POST(request) {
     }
 
     const data = await request.json();
-    const { first_name, last_name, birthdate, phone_number, blood_type, district_id, full_address, notes } = data;
-
-    // Validate required fields
-    if (!first_name || !last_name || !birthdate || !phone_number || !blood_type || !district_id) {
-      return NextResponse.json(
-        { error: 'All required fields must be filled' },
-        { status: 400 }
-      );
+    
+    // Ensure district_id is an integer
+    if (data.district_id) {
+      data.district_id = parseInt(data.district_id);
     }
 
-    // Validate phone format
-    if (!phone_number.startsWith('+20')) {
-      return NextResponse.json(
-        { error: 'Phone number must start with +20' },
-        { status: 400 }
-      );
-    }
-
-    // Check if phone already exists
-    const { data: existingDonor } = await supabaseAdmin
-      .from('donors')
-      .select('donor_id')
-      .eq('phone_number', phone_number)
-      .single();
-
-    if (existingDonor) {
-      return NextResponse.json(
-        { error: 'A donor with this phone number already exists' },
-        { status: 409 }
-      );
-    }
-
-    // Insert new donor
     const { data: newDonor, error } = await supabaseAdmin
       .from('donors')
-      .insert({
-        user_id: user.userId,
-        first_name,
-        last_name,
-        birthdate,
-        phone_number,
-        blood_type,
-        district_id,
-        full_address,
-        notes,
+      .insert({ 
+        ...data, 
+        user_id: user.userId, // Maintain consistency with current schema
+        is_active: true 
       })
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      if (error.code === '23505') {
+        return NextResponse.json({ error: 'National ID or Phone number already exists' }, { status: 409 });
+      }
+      throw error;
+    }
 
-    return NextResponse.json({
-      success: true,
-      donor: newDonor,
-      message: 'Donor added successfully',
-    }, { status: 201 });
+    return NextResponse.json({ success: true, donor: newDonor }, { status: 201 });
   } catch (error) {
-    return NextResponse.json(
-      { error: error.message },
-      { status: 500 }
-    );
+    console.error('Donor POST Error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
-// PUT - Update donor (admin only)
 export async function PUT(request) {
   try {
     const user = await getCurrentUser();
+    // Only Admin (2) can update donors
     if (!user || user.role !== 2) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
-    const data = await request.json();
-    const { donor_id, ...updateData } = data;
-
+    const { donor_id, ...updateData } = await request.json();
     if (!donor_id) {
-      return NextResponse.json(
-        { error: 'Donor ID is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Donor ID is required' }, { status: 400 });
     }
 
-    const { data: updatedDonor, error } = await supabaseAdmin
+    // Ensure district_id is an integer if provided
+    if (updateData.district_id) {
+      updateData.district_id = parseInt(updateData.district_id);
+    }
+
+    // Clean up updateData to prevent issues with joins being sent back
+    delete updateData.districts;
+    delete updateData.donations;
+
+    const { data: updated, error } = await supabaseAdmin
       .from('donors')
       .update(updateData)
       .eq('donor_id', donor_id)
@@ -182,15 +155,39 @@ export async function PUT(request) {
 
     if (error) throw error;
 
-    return NextResponse.json({
-      success: true,
-      donor: updatedDonor,
-      message: 'Donor updated successfully',
-    });
+    return NextResponse.json({ success: true, donor: updated });
   } catch (error) {
-    return NextResponse.json(
-      { error: error.message },
-      { status: 500 }
-    );
+    console.error('Donor PUT Error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+export async function DELETE(request) {
+  try {
+    const user = await getCurrentUser();
+    // Only Admin (2) can delete/deactivate donors
+    if (!user || user.role !== 2) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const donorId = searchParams.get('id');
+
+    if (!donorId) {
+      return NextResponse.json({ error: 'Donor ID is required' }, { status: 400 });
+    }
+
+    // Soft delete by setting is_active to false
+    const { error } = await supabaseAdmin
+      .from('donors')
+      .update({ is_active: false })
+      .eq('donor_id', donorId);
+
+    if (error) throw error;
+
+    return NextResponse.json({ success: true, message: 'Donor deactivated successfully' });
+  } catch (error) {
+    console.error('Donor DELETE Error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

@@ -5,6 +5,7 @@ import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import { BLOOD_TYPES } from '@/utils/constants';
 import { getYearsList } from '@/utils/dateUtils';
+import { getCurrentYear, getCurrentSession } from '@/utils/helpers';
 import { useToast } from '@/context/ToastContext';
 
 export default function WhatsAppSender({ onClose }) {
@@ -13,8 +14,8 @@ export default function WhatsAppSender({ onClose }) {
   const [imageUrl, setImageUrl] = useState('');
   const [filters, setFilters] = useState({
     blood_type: '',
-    year: '',
-    session: '',
+    year: getCurrentYear(),
+    session: getCurrentSession(),
   });
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState(null);
@@ -130,10 +131,25 @@ export default function WhatsAppSender({ onClose }) {
         <div className={`p-4 rounded-xl ${
           results.total_failed === 0 ? 'bg-green-50 border border-green-200' : 'bg-yellow-50 border border-yellow-200'
         }`}>
-          <p className="font-semibold">
-            ✅ Sent: {results.total_sent} | ❌ Failed: {results.total_failed}
-          </p>
-          <p className="text-sm text-gray-600 mt-1">{results.message}</p>
+          <div className="flex justify-between items-center mb-2">
+            <p className="font-bold text-gray-800">
+              ✅ Sent: {results.total_sent} | ❌ Failed: {results.total_failed}
+            </p>
+            <Button variant="ghost" size="small" onClick={() => setResults(null)}>Dismiss</Button>
+          </div>
+          
+          {results.total_failed > 0 && (
+            <div className="mt-2 space-y-1 max-h-32 overflow-y-auto">
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Failure Details</p>
+              {results.results.filter(r => !r.success).map((r, i) => (
+                <div key={i} className="text-[11px] text-red-600 bg-red-50 p-2 rounded-lg flex justify-between">
+                  <span>{r.phone}</span>
+                  <span className="font-medium">{r.error}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          <p className="text-sm text-gray-600 mt-2">{results.message}</p>
         </div>
       )}
     </div>

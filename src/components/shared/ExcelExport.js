@@ -4,12 +4,16 @@ import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
 import Select from '@/components/ui/Select';
 import { getYearsList } from '@/utils/dateUtils';
+import { getCurrentYear, getCurrentSession } from '@/utils/helpers';
 import { useToast } from '@/context/ToastContext';
 import * as XLSX from 'xlsx';
 
 export default function ExcelExport() {
   const [showModal, setShowModal] = useState(false);
-  const [filters, setFilters] = useState({ year: '', session: '' });
+  const [filters, setFilters] = useState({ 
+    year: getCurrentYear(), 
+    session: getCurrentSession() 
+  });
   const [loading, setLoading] = useState(false);
   const toast = useToast();
 

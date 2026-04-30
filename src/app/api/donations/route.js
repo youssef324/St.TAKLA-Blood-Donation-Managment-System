@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
-import { supabaseAdmin } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
 // GET - Get donations for a donor
 export async function GET(request) {
@@ -48,7 +48,17 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
-    const { donor_id, donation_year, donation_session, donation_date } = await request.json();
+    const { 
+      donor_id, 
+      donation_year, 
+      donation_session, 
+      donation_date,
+      bag_number,
+      hb_level,
+      blood_pressure,
+      weight,
+      notes
+    } = await request.json();
 
     if (!donor_id || !donation_year || !donation_session) {
       return NextResponse.json(
@@ -81,6 +91,11 @@ export async function POST(request) {
         donation_year,
         donation_session,
         donation_date: donation_date || new Date().toISOString(),
+        bag_number,
+        hb_level,
+        blood_pressure,
+        weight,
+        notes,
         added_by: user.userId,
       })
       .select()

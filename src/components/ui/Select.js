@@ -1,24 +1,25 @@
 'use client';
 import { useState } from 'react';
 
-export default function Select({
-  label,
+export default function Select({ 
+  label, 
+  options = [], 
+  value, 
+  onChange, 
+  placeholder = 'Select option', 
+  error, 
+  required,
+  disabled,
   name,
-  value,
-  onChange,
-  options = [],
-  placeholder = 'Select...',
-  error = '',
-  required = false,
-  disabled = false,
-  className = '',
+  className = ''
 }) {
   const [focused, setFocused] = useState(false);
 
   // Find the selected option label
-  const selectedOption = options.find(opt => 
-    (opt.value || opt) == value
-  );
+  const selectedOption = options.find(opt => {
+    const val = opt && typeof opt === 'object' && opt.hasOwnProperty('value') ? opt.value : opt;
+    return String(val) === String(value);
+  });
   const selectedLabel = selectedOption?.label || selectedOption || placeholder;
 
   return (
@@ -33,7 +34,7 @@ export default function Select({
       <div className="relative">
         <select
           name={name}
-          value={value}
+          value={value ?? ''}
           onChange={onChange}
           required={required}
           disabled={disabled}
@@ -43,7 +44,7 @@ export default function Select({
             w-full px-4 py-2.5 rounded-xl outline-none appearance-none cursor-pointer
             transition-all duration-300 bg-white border
             text-gray-900
-            ${value ? 'text-gray-900' : 'text-gray-400'}
+            ${value !== undefined && value !== '' ? 'text-gray-900' : 'text-gray-400'}
             ${
               error
                 ? 'border-red-500 ring-2 ring-red-200'
@@ -55,15 +56,15 @@ export default function Select({
           `}
         >
           <option value="" className="text-gray-400">{placeholder}</option>
-          {options.map((option) => (
-            <option 
-              key={option.value || option} 
-              value={option.value || option}
-              className="text-gray-900"
-            >
-              {option.label || option}
-            </option>
-          ))}
+          {options.map((option, i) => {
+            const val = option && typeof option === 'object' && option.hasOwnProperty('value') ? option.value : option;
+            const labelStr = option && typeof option === 'object' && option.hasOwnProperty('label') ? option.label : option;
+            return (
+              <option key={i} value={val} className="text-gray-900">
+                {labelStr}
+              </option>
+            );
+          })}
         </select>
 
         {/* Custom arrow */}
@@ -73,16 +74,16 @@ export default function Select({
           </svg>
         </div>
 
-        {/* Show selected value */}
-        {value && focused && (
-          <div className="absolute left-3 -top-2 text-xs text-red-500 bg-white px-1">
-            Selected: {selectedLabel}
+        {/* Floating Label for focus state */}
+        {focused && (
+          <div className="absolute left-3 -top-2 text-[10px] font-bold text-red-500 bg-white px-1 uppercase tracking-wider">
+            {label || 'Selection'}
           </div>
         )}
       </div>
 
       {error && (
-        <p className="text-red-500 text-xs font-medium flex items-center gap-1">
+        <p className="text-red-500 text-xs font-medium flex items-center gap-1 animate-shake">
           <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
           </svg>

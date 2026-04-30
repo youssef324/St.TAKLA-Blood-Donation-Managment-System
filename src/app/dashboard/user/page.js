@@ -12,7 +12,7 @@ export default function UserDashboard() {
   const [searchParams, setSearchParams] = useState({});
 
   return (
-    <ProtectedRoute allowedRoles={[0]}>
+    <ProtectedRoute allowedRoles={[0, 1, 2]}>
       <div className="flex min-h-screen bg-gray-50">
         <Sidebar />
         <div className="flex-1 ml-64">

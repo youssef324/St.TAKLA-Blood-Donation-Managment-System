@@ -7,6 +7,7 @@ import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
 import DonorForm from '@/components/donors/DonorForm';
 import DonorTable from '@/components/donors/DonorTable';
+import DonorProfile from '@/components/donors/DonorProfile';
 import ExcelExport from '@/components/shared/ExcelExport';
 import WhatsAppSender from '@/components/shared/WhatsAppSender';
 import StatsCard from '@/components/dashboard/StatsCard';
@@ -17,6 +18,8 @@ import { useRouter } from 'next/navigation';
 export default function AdminDashboard() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showWhatsApp, setShowWhatsApp] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [selectedDonor, setSelectedDonor] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [stats, setStats] = useState({ 
     donors: 0, 
@@ -33,22 +36,23 @@ export default function AdminDashboard() {
 
   const fetchStats = async () => {
     try {
-      const [donorsRes, usersRes] = await Promise.all([
-        fetch('/api/donors?limit=1'),
-        fetch('/api/admin/users'),
-      ]);
+      const res = await fetch('/api/admin/stats');
+      const data = await res.json();
       
-      const donorsData = await donorsRes.json();
-      const usersData = await usersRes.json();
+      if (!res.ok) throw new Error(data.error);
 
       setStats({
-        donors: donorsData.total || 0,
-        users: usersData.users?.length || 0,
-        donations: donorsData.total || 0,
+        donors: data.donors,
+        donations: data.donations,
+        users: data.users,
       });
     } catch (error) {
       console.error('Failed to fetch stats:', error);
+      toast.error('Could not refresh dashboard stats');
     }
+  const handleView = (donor) => {
+    setSelectedDonor(donor);
+    setShowProfileModal(true);
   };
 
   return (
@@ -126,9 +130,7 @@ export default function AdminDashboard() {
               <DonorTable 
                 refreshKey={refreshKey}
                 isAdmin={true}
-                onEdit={(donor) => {
-                  /* Handle edit */
-                }}
+                onView={handleView}
               />
             </motion.div>
 
@@ -144,9 +146,25 @@ export default function AdminDashboard() {
             <Modal isOpen={showWhatsApp} onClose={() => setShowWhatsApp(false)} title="Send WhatsApp Message" size="large">
               <WhatsAppSender onClose={() => setShowWhatsApp(false)} />
             </Modal>
+
+            {/* Profile View Modal */}
+            <Modal
+              isOpen={showProfileModal}
+              onClose={() => setShowProfileModal(false)}
+              title="Donor Profile"
+              size="large"
+            >
+              {selectedDonor && (
+                <DonorProfile 
+                  donorId={selectedDonor.donor_id} 
+                  onClose={() => setShowProfileModal(false)} 
+                />
+              )}
+            </Modal>
           </AnimatedPage>
         </div>
       </div>
     </ProtectedRoute>
   );
+}
 }

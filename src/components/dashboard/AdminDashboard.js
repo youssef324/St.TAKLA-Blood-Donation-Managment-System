@@ -23,7 +23,7 @@ export default function AdminDashboardContent() {
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <StatsCard title="Total Donors" value="--" icon="👥" color="from-blue-500 to-blue-600" />
-        <StatsCard title="Donations" value="--" icon="🩸" color="from-red-500 to-red-600" />
+        <StatsCard title="Donations" value="--" icon="🩸" color="from-red-200 to-red-600" />
         <StatsCard title="Users" value="--" icon="👤" color="from-green-500 to-green-600" />
         <StatsCard title="Blood Types" value="8" icon="🅰️" color="from-purple-500 to-purple-600" />
       </div>

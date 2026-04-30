@@ -7,6 +7,7 @@ import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
 import DonorForm from '@/components/donors/DonorForm';
 import DonorTable from '@/components/donors/DonorTable';
+import DonorProfile from '@/components/donors/DonorProfile';
 import ExcelExport from '@/components/shared/ExcelExport';
 import StatsCard from '@/components/dashboard/StatsCard';
 import { motion } from 'framer-motion';
@@ -15,6 +16,7 @@ import { useToast } from '@/context/ToastContext';
 export default function SuperUserDashboard() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showAddDonation, setShowAddDonation] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
   const [selectedDonor, setSelectedDonor] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [stats, setStats] = useState({ total: 0, thisYear: 0, thisSession: 0 });
@@ -26,15 +28,19 @@ export default function SuperUserDashboard() {
 
   const fetchStats = async () => {
     try {
-      const res = await fetch('/api/donors?limit=1');
+      const res = await fetch('/api/admin/stats');
       const data = await res.json();
+      
+      if (!res.ok) throw new Error(data.error);
+
       setStats({
-        total: data.total || 0,
-        thisYear: data.total || 0, // Simplified - you can add more specific counts
-        thisSession: data.total || 0,
+        total: data.donors,
+        thisYear: data.thisYear,
+        thisSession: data.thisSession,
       });
     } catch (error) {
       console.error('Failed to fetch stats:', error);
+      toast.error('Could not refresh dashboard stats');
     }
   };
 
@@ -50,8 +56,13 @@ export default function SuperUserDashboard() {
     toast.success('Donation added successfully!');
   };
 
+  const handleView = (donor) => {
+    setSelectedDonor(donor);
+    setShowProfileModal(true);
+  };
+
   return (
-    <ProtectedRoute allowedRoles={[1]}>
+    <ProtectedRoute allowedRoles={[1, 2]}>
       <div className="flex min-h-screen bg-gray-50">
         <Sidebar />
         <div className="flex-1 ml-64">
@@ -103,6 +114,7 @@ export default function SuperUserDashboard() {
                   setSelectedDonor(donor);
                   setShowAddDonation(true);
                 }}
+                onView={handleView}
               />
             </motion.div>
 
@@ -121,8 +133,22 @@ export default function SuperUserDashboard() {
               onClose={() => setShowAddDonation(false)}
               title={`Add Donation - ${selectedDonor?.first_name} ${selectedDonor?.last_name}`}
             >
-              {/* You'll need to create DonationForm component */}
-              <Button onClick={handleAddDonation}>Add Donation</Button>
+              <Button onClick={handleAddDonation}>Confirm Donation</Button>
+            </Modal>
+
+            {/* Profile View Modal */}
+            <Modal
+              isOpen={showProfileModal}
+              onClose={() => setShowProfileModal(false)}
+              title="Donor Profile"
+              size="large"
+            >
+              {selectedDonor && (
+                <DonorProfile 
+                  donorId={selectedDonor.donor_id} 
+                  onClose={() => setShowProfileModal(false)} 
+                />
+              )}
             </Modal>
           </AnimatedPage>
         </div>

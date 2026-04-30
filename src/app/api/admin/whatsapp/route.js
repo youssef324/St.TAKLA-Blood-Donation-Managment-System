@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
-import { supabaseAdmin } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
 // POST - Send WhatsApp message
 export async function POST(request) {
@@ -50,10 +50,13 @@ export async function POST(request) {
 
     // Filter by year/session if specified
     if (year || session) {
+      const targetYear = year ? parseInt(year) : null;
+      const targetSession = session ? parseInt(session) : null;
+      
       donors = donors.filter(donor => 
         donor.donations.some(d => {
-          if (year && d.donation_year !== year) return false;
-          if (session && d.donation_session !== session) return false;
+          if (targetYear && d.donation_year !== targetYear) return false;
+          if (targetSession && d.donation_session !== targetSession) return false;
           return true;
         })
       );
@@ -72,12 +75,15 @@ export async function POST(request) {
 
     for (const donor of donors) {
       try {
+        // Meta API requires phone number WITHOUT '+'
+        const normalizedPhone = donor.phone_number.replace('+', '');
+        
         let payload;
         
         if (message_type === 'image') {
           payload = {
             messaging_product: 'whatsapp',
-            to: donor.phone_number,
+            to: normalizedPhone,
             type: 'image',
             image: {
               link: media_url,
@@ -87,7 +93,7 @@ export async function POST(request) {
         } else {
           payload = {
             messaging_product: 'whatsapp',
-            to: donor.phone_number,
+            to: normalizedPhone,
             type: 'text',
             text: {
               body: message_content
@@ -108,12 +114,23 @@ export async function POST(request) {
         );
 
         const result = await response.json();
-        results.push({
-          donor_id: donor.donor_id,
-          phone: donor.phone_number,
-          success: response.ok,
-          message_id: result.messages?.[0]?.id
-        });
+        
+        if (!response.ok) {
+          console.error('WhatsApp API Error for', donor.phone_number, ':', result);
+          results.push({
+            donor_id: donor.donor_id,
+            phone: donor.phone_number,
+            success: false,
+            error: result.error?.message || 'Unknown Meta error'
+          });
+        } else {
+          results.push({
+            donor_id: donor.donor_id,
+            phone: donor.phone_number,
+            success: true,
+            message_id: result.messages?.[0]?.id
+          });
+        }
 
         // Log the message
         logs.push({

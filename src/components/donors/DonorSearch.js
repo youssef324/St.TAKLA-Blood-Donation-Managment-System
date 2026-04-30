@@ -7,7 +7,7 @@ import { BLOOD_TYPES } from '@/utils/constants';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getYearsList } from '@/utils/dateUtils';
 
-export default function DonorSearch({ onSelectDonor, searchParams, setSearchParams }) {
+export default function DonorSearch({ onSelectDonor, onEditDonor, searchParams, setSearchParams }) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -87,7 +87,7 @@ export default function DonorSearch({ onSelectDonor, searchParams, setSearchPara
               exit={{ opacity: 0, x: 20 }}
               whileHover={{ scale: 1.02 }}
               onClick={() => onSelectDonor(donor)}
-              className="p-3 bg-gray-50 rounded-xl cursor-pointer hover:bg-red-50 hover:border-red-200 border border-transparent transition-all"
+              className="p-3 bg-gray-50 rounded-xl cursor-pointer hover:bg-red-50 hover:border-red-200 border border-transparent transition-all flex justify-between items-center"
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center text-red-600 font-bold">
@@ -95,9 +95,24 @@ export default function DonorSearch({ onSelectDonor, searchParams, setSearchPara
                 </div>
                 <div>
                   <p className="font-semibold">{donor.first_name} {donor.last_name}</p>
-                  <p className="text-sm text-gray-500">{donor.phone_number}</p>
+                  <p className="text-sm text-gray-500">
+                    {donor.phone_number} • {donor.districts?.district_name || 'No District'}
+                  </p>
                 </div>
               </div>
+
+              {onEditDonor && (
+                <Button 
+                  size="small" 
+                  variant="secondary" 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEditDonor(donor);
+                  }}
+                >
+                  ✏️
+                </Button>
+              )}
             </motion.div>
           ))}
         </div>

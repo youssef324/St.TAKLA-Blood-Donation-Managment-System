@@ -22,7 +22,7 @@ export default function Logo({ size = 'medium', showText = true }) {
       whileTap={{ scale: 0.95 }}
       onClick={() => router.push('/dashboard')}
     >
-      {/* STATIC Logo - No rotation, BIG, Black background */}
+      
       <div
         className="relative"
         style={{ width, height }}
