@@ -38,7 +38,7 @@ export async function POST(request) {
 
     const token = jwt.sign(
       { userId: user.user_id, username: user.username, role: user.role },
-      process.env.JWT_SECRET || 'BloodDonation2024Secret!@#$',
+      process.env.JWT_SECRET,
       { expiresIn: '4h' }
     );
 
