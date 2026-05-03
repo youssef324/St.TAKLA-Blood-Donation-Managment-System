@@ -62,9 +62,6 @@ export default function SettingsPage() {
                   <Button variant="secondary" onClick={handleClearCache}>
                     Clear Cache
                   </Button>
-                  <Button variant="outline" className="border-red-200 text-red-600 hover:bg-red-50">
-                    System Audit Log
-                  </Button>
                 </div>
                 <p className="mt-4 text-xs text-red-500 font-medium italic">
                   Note: Some actions are limited to super-administrators.

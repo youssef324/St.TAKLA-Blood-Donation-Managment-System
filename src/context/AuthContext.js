@@ -18,10 +18,12 @@ export function AuthProvider({ children }) {
       const res = await fetch('/api/auth/login');
       if (res.ok) {
         const data = await res.json();
-        setUser(data.user);
+        if (data.user) {
+          setUser(data.user);
+        }
       }
     } catch (error) {
-      console.error('Auth check failed:', error);
+      // Not logged in
     } finally {
       setLoading(false);
     }
@@ -50,15 +52,19 @@ export function AuthProvider({ children }) {
     router.push('/login');
   };
 
-  const value = { user, loading, login, logout, checkAuth };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, loading, login, logout, checkAuth }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+  if (context === undefined || context === null) {
+    return { user: null, loading: false, login: () => {}, logout: () => {}, checkAuth: () => {} };
   }
   return context;
 }
+
+export default AuthContext;
