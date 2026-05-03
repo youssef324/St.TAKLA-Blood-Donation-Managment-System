@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { cookies } from 'next/headers';
-import { supabaseAdmin } from './supabaseAdmin';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'BloodDonation2024Secret!@#$';
 

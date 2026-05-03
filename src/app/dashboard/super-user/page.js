@@ -1,4 +1,6 @@
-'use client';
+﻿'use client';
+
+export const dynamic = 'force-dynamic';
 import { useState, useEffect } from 'react';
 import AnimatedPage from '@/components/ui/AnimatedPage';
 import Sidebar from '@/components/ui/Sidebar';
@@ -74,7 +76,7 @@ export default function SuperUserDashboard() {
               </div>
               <div className="flex gap-3">
                 <ExcelExport />
-                <Button onClick={() => setShowAddModal(true)} icon="➕">
+                <Button onClick={() => setShowAddModal(true)} icon="âž•">
                   Add New Donor
                 </Button>
               </div>
@@ -85,19 +87,19 @@ export default function SuperUserDashboard() {
               <StatsCard 
                 title="Total Donors" 
                 value={stats.total} 
-                icon="👥"
+                icon="ðŸ‘¥"
                 color="from-blue-500 to-blue-600"
               />
               <StatsCard 
                 title="This Year" 
                 value={stats.thisYear} 
-                icon="📅"
+                icon="ðŸ“…"
                 color="from-green-500 to-green-600"
               />
               <StatsCard 
                 title="Current Session" 
                 value={stats.thisSession} 
-                icon="🩸"
+                icon="ðŸ©¸"
                 color="from-red-500 to-red-600"
               />
             </div>

@@ -6,7 +6,6 @@ import Select from '@/components/ui/Select';
 import { BLOOD_TYPES } from '@/utils/constants';
 import { validatePhone, validateAge } from '@/utils/validators';
 import { saveDonorOffline } from '@/lib/offlineSync';
-import { supabase } from '@/lib/supabase';
 
 export default function DonorForm({ donor = null, onSubmit }) {
   const [districts, setDistricts] = useState([]);

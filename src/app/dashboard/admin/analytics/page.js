@@ -1,4 +1,6 @@
-'use client';
+﻿'use client';
+
+export const dynamic = 'force-dynamic';
 import { useState, useEffect } from 'react';
 import AnimatedPage from '@/components/ui/AnimatedPage';
 import Sidebar from '@/components/ui/Sidebar';
@@ -89,10 +91,10 @@ export default function AnalyticsPage() {
 
             {/* Overview Stats */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-              <StatsCard title="Total Donors" value={stats.totalDonors} icon="👥" color="from-blue-500 to-blue-600" />
-              <StatsCard title="Total Donations" value={stats.totalDonations} icon="🩸" color="from-red-500 to-red-600" />
-              <StatsCard title="This Year" value={stats.thisYear} icon="📅" color="from-green-500 to-green-600" />
-              <StatsCard title="Blood Types" value={Object.keys(stats.bloodTypeCounts).length} icon="🅰️" color="from-purple-500 to-purple-600" />
+              <StatsCard title="Total Donors" value={stats.totalDonors} icon="ðŸ‘¥" color="from-blue-500 to-blue-600" />
+              <StatsCard title="Total Donations" value={stats.totalDonations} icon="ðŸ©¸" color="from-red-500 to-red-600" />
+              <StatsCard title="This Year" value={stats.thisYear} icon="ðŸ“…" color="from-green-500 to-green-600" />
+              <StatsCard title="Blood Types" value={Object.keys(stats.bloodTypeCounts).length} icon="ðŸ…°ï¸" color="from-purple-500 to-purple-600" />
             </div>
 
             {/* Blood Type Distribution */}
@@ -120,7 +122,7 @@ export default function AnalyticsPage() {
             {/* Quick Stats */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="card">
-                <h3 className="text-lg font-bold mb-4">📊 Most Common Blood Types</h3>
+                <h3 className="text-lg font-bold mb-4">ðŸ“Š Most Common Blood Types</h3>
                 {Object.entries(stats.bloodTypeCounts)
                   .sort((a, b) => b[1] - a[1])
                   .slice(0, 3)
@@ -133,7 +135,7 @@ export default function AnalyticsPage() {
               </motion.div>
 
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="card">
-                <h3 className="text-lg font-bold mb-4">🎯 System Info</h3>
+                <h3 className="text-lg font-bold mb-4">ðŸŽ¯ System Info</h3>
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between py-2 border-b">
                     <span className="text-gray-600">App Name</span>
@@ -141,7 +143,7 @@ export default function AnalyticsPage() {
                   </div>
                   <div className="flex justify-between py-2 border-b">
                     <span className="text-gray-600">Database</span>
-                    <span className="font-semibold text-green-600">Connected ✅</span>
+                    <span className="font-semibold text-green-600">Connected âœ…</span>
                   </div>
                   <div className="flex justify-between py-2 border-b">
                     <span className="text-gray-600">Session Timeout</span>

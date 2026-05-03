@@ -1,4 +1,6 @@
-'use client';
+﻿'use client';
+
+export const dynamic = 'force-dynamic';
 import { useState, useEffect } from 'react';
 import AnimatedPage from '@/components/ui/AnimatedPage';
 import Sidebar from '@/components/ui/Sidebar';
@@ -180,7 +182,7 @@ export default function UsersPage() {
                             size="small"
                             onClick={() => handleEditClick(user)}
                           >
-                            ✏️ Edit
+                            âœï¸ Edit
                           </Button>
                           <Button
                             variant={user.is_active ? 'danger' : 'success'}
@@ -229,7 +231,7 @@ export default function UsersPage() {
                   required
                 />
                 <Button type="submit" className="w-full mt-6">
-                  ✨ Create Account
+                  âœ¨ Create Account
                 </Button>
               </form>
             </Modal>
@@ -265,7 +267,7 @@ export default function UsersPage() {
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 />
                 <Button type="submit" className="w-full mt-6">
-                  💾 Save Changes
+                  ðŸ’¾ Save Changes
                 </Button>
               </form>
             </Modal>

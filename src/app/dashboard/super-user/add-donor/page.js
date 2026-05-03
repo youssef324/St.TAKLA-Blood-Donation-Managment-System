@@ -1,4 +1,6 @@
-'use client';
+﻿'use client';
+
+export const dynamic = 'force-dynamic';
 import AnimatedPage from '@/components/ui/AnimatedPage';
 import Sidebar from '@/components/ui/Sidebar';
 import ProtectedRoute from '@/components/shared/ProtectedRoute';
