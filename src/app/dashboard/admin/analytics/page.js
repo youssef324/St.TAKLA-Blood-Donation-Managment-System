@@ -139,7 +139,7 @@ export default function AnalyticsPage() {
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between py-2 border-b">
                     <span className="text-gray-600">App Name</span>
-                    <span className="font-semibold">Blood Donations</span>
+                    <span className="font-semibold">The Blood Donations</span>
                   </div>
                   <div className="flex justify-between py-2 border-b">
                     <span className="text-gray-600">Database</span>
