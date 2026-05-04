@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { FaPlusCircle, FaPhone, FaChurch, FaMapMarkerAlt } from 'react-icons/fa';
 import Button from '@/components/ui/Button';
 import DonationHistory from './DonationHistory';
 import DonationForm from './DonationForm';
@@ -81,7 +82,7 @@ export default function DonorProfile({ donorId, donor: initialDonor, onClose }) 
                 className="shadow-lg shadow-green-900/20"
                 onClick={() => setShowAddDonation(true)}
               >
-                🩸 Record New Donation
+                <FaPlusCircle className="inline mr-2" /> Record New Donation
               </Button>
             )}
             <div className="text-center md:text-right">
@@ -103,9 +104,9 @@ export default function DonorProfile({ donorId, donor: initialDonor, onClose }) 
           <div className="card h-full">
             <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6">Contact & Location</h3>
             <div className="space-y-6">
-              <InfoRow icon="📱" label="Phone Number" value={formatPhone(donor.phone_number)} link={`tel:${donor.phone_number}`} />
-              <InfoRow icon="⛪" label="Church" value={donor.church || 'Not specified'} />
-              <InfoRow icon="📍" label="Address" value={donor.full_address || 'Not specified'} sub={districtName} />
+              <InfoRow icon={<FaPhone />} label="Phone Number" value={formatPhone(donor.phone_number)} link={`tel:${donor.phone_number}`} />
+              <InfoRow icon={<FaChurch />} label="Church" value={donor.church || 'Not specified'} />
+              <InfoRow icon={<FaMapMarkerAlt />} label="Address" value={donor.full_address || 'Not specified'} sub={districtName} />
               <div className="flex gap-2 pt-4">
                 <Button 
                   variant="outline" 
@@ -171,7 +172,7 @@ export default function DonorProfile({ donorId, donor: initialDonor, onClose }) 
 function InfoRow({ icon, label, value, sub, link }) {
   return (
     <div className="flex items-start gap-4">
-      <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-lg shadow-sm border border-gray-100">
+      <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-lg shadow-sm border border-gray-100 text-gray-600">
         {icon}
       </div>
       <div>
