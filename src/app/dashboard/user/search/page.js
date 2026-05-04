@@ -1,7 +1,8 @@
-﻿'use client';
+'use client';
 
 export const dynamic = 'force-dynamic';
 import { useState } from 'react';
+import { FaSearch } from 'react-icons/fa';
 import AnimatedPage from '@/components/ui/AnimatedPage';
 import Sidebar from '@/components/ui/Sidebar';
 import ProtectedRoute from '@/components/shared/ProtectedRoute';
@@ -61,7 +62,7 @@ export default function SearchPage() {
                     <DonorProfile donorId={selectedDonor.donor_id} />
                   ) : (
                     <div className="flex flex-col items-center justify-center py-12 text-gray-400 text-center">
-                      <div className="text-6xl mb-4">ðŸ”</div>
+                      <FaSearch className="text-6xl text-gray-200 mb-4" />
                       <p className="text-lg font-medium">Select a donor from the search results to view their profile</p>
                     </div>
                   )}

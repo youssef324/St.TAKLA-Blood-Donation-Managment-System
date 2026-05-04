@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
+import { FaEye, FaPlusCircle, FaEdit, FaTrash, FaSearch } from 'react-icons/fa';
 import Table from '@/components/ui/Table';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -79,22 +80,22 @@ export default function DonorTable({ refreshKey, isAdmin, onEdit, onAddDonation,
         <div className="flex gap-2">
           {onView && (
             <Button size="small" variant="outline" onClick={() => onView(donor)}>
-              👁️ View
+              <FaEye className="inline mr-1" /> View
             </Button>
           )}
           {onAddDonation && (
             <Button size="small" variant="success" onClick={() => onAddDonation(donor)}>
-              🩸 +Donation
+              <FaPlusCircle className="inline mr-1" /> +Donation
             </Button>
           )}
           {onEdit && (
             <Button size="small" variant="secondary" onClick={() => onEdit(donor)}>
-              ✏️ Edit
+              <FaEdit className="inline mr-1" /> Edit
             </Button>
           )}
           {isAdmin && (
             <Button size="small" variant="ghost" onClick={() => handleDelete(donor.donor_id)}>
-              🗑️
+              <FaTrash />
             </Button>
           )}
         </div>
@@ -113,7 +114,7 @@ export default function DonorTable({ refreshKey, isAdmin, onEdit, onAddDonation,
               setQuery(e.target.value);
               setPage(1);
             }}
-            icon="🔍"
+            icon={<FaSearch />}
           />
         </div>
         <div className="text-sm text-gray-500">

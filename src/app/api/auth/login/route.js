@@ -56,7 +56,8 @@ export async function POST(request) {
       user: { id: user.user_id, username: user.username, role: user.role },
     });
   } catch (error) {
-    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+    console.error('Login Error Details:', error);
+    return NextResponse.json({ error: 'Server error', details: error.message }, { status: 500 });
   }
 }
 

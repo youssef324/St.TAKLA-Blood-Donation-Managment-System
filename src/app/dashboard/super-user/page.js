@@ -1,7 +1,8 @@
-﻿'use client';
+'use client';
 
 export const dynamic = 'force-dynamic';
 import { useState, useEffect } from 'react';
+import { FaUsers, FaCalendarAlt, FaTint, FaPlus } from 'react-icons/fa';
 import AnimatedPage from '@/components/ui/AnimatedPage';
 import Sidebar from '@/components/ui/Sidebar';
 import ProtectedRoute from '@/components/shared/ProtectedRoute';
@@ -76,7 +77,7 @@ export default function SuperUserDashboard() {
               </div>
               <div className="flex gap-3">
                 <ExcelExport />
-                <Button onClick={() => setShowAddModal(true)} icon="âž•">
+                <Button onClick={() => setShowAddModal(true)} icon={<FaPlus />}>
                   Add New Donor
                 </Button>
               </div>
@@ -87,19 +88,19 @@ export default function SuperUserDashboard() {
               <StatsCard 
                 title="Total Donors" 
                 value={stats.total} 
-                icon="ðŸ‘¥"
+                icon={<FaUsers />}
                 color="from-blue-500 to-blue-600"
               />
               <StatsCard 
                 title="This Year" 
                 value={stats.thisYear} 
-                icon="ðŸ“…"
+                icon={<FaCalendarAlt />}
                 color="from-green-500 to-green-600"
               />
               <StatsCard 
                 title="Current Session" 
                 value={stats.thisSession} 
-                icon="ðŸ©¸"
+                icon={<FaTint />}
                 color="from-red-500 to-red-600"
               />
             </div>

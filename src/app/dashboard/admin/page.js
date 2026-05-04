@@ -1,7 +1,8 @@
-﻿'use client';
+'use client';
 
 export const dynamic = 'force-dynamic';
 import { useState, useEffect } from 'react';
+import { FaUsers, FaTint, FaUserCheck, FaWhatsapp, FaPlus, FaChartBar, FaUserCog, FaVial } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import AnimatedPage from '@/components/ui/AnimatedPage';
 import Sidebar from '@/components/ui/Sidebar';
@@ -80,34 +81,38 @@ export default function AdminDashboard() {
                 <p className="text-gray-600 mt-2">Full system control panel</p>
               </div>
               <div className="flex gap-3">
-                <Button variant="secondary" onClick={() => setShowWhatsApp(true)}>ðŸ’¬ Send WhatsApp</Button>
+                <Button variant="secondary" onClick={() => setShowWhatsApp(true)}>
+                  <FaWhatsapp className="inline mr-2" /> Send WhatsApp
+                </Button>
                 <ExcelExport />
-                <Button onClick={() => setShowAddModal(true)}>âž• Add Donor</Button>
+                <Button onClick={() => setShowAddModal(true)}>
+                  <FaPlus className="inline mr-2" /> Add Donor
+                </Button>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-              <StatsCard title="Total Donors" value={stats.donors} icon="ðŸ‘¥" color="from-blue-500 to-blue-600" />
-              <StatsCard title="Total Donations" value={stats.donations} icon="ðŸ©¸" color="from-red-500 to-red-600" />
-              <StatsCard title="Active Users" value={stats.users} icon="ðŸ‘¤" color="from-green-500 to-green-600" />
-              <StatsCard title="Blood Types" value="8" icon="ðŸ…°ï¸" color="from-purple-500 to-purple-600" />
+              <StatsCard title="Total Donors" value={stats.donors} icon={<FaUsers />} color="from-blue-500 to-blue-600" />
+              <StatsCard title="Total Donations" value={stats.donations} icon={<FaTint />} color="from-red-500 to-red-600" />
+              <StatsCard title="Active Users" value={stats.users} icon={<FaUserCheck />} color="from-green-500 to-green-600" />
+              <StatsCard title="Blood Types" value="8" icon={<FaVial />} color="from-purple-500 to-purple-600" />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => router.push('/dashboard/admin/users')} className="card cursor-pointer text-center">
-                <div className="text-4xl mb-3">ðŸ‘¤</div>
+              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => router.push('/dashboard/admin/users')} className="card cursor-pointer text-center p-6">
+                <FaUserCog size={40} className="mx-auto mb-3 text-blue-500" />
                 <h3 className="text-lg font-semibold">Manage Users</h3>
                 <p className="text-gray-500 text-sm">Add/Edit system users</p>
               </motion.button>
 
-              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => setShowWhatsApp(true)} className="card cursor-pointer text-center">
-                <div className="text-4xl mb-3">ðŸ’¬</div>
+              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => setShowWhatsApp(true)} className="card cursor-pointer text-center p-6">
+                <FaWhatsapp size={40} className="mx-auto mb-3 text-green-500" />
                 <h3 className="text-lg font-semibold">WhatsApp</h3>
                 <p className="text-gray-500 text-sm">Send messages to donors</p>
               </motion.button>
 
-              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="card cursor-pointer text-center">
-                <div className="text-4xl mb-3">ðŸ“Š</div>
+              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="card cursor-pointer text-center p-6">
+                <FaChartBar size={40} className="mx-auto mb-3 text-purple-500" />
                 <h3 className="text-lg font-semibold">Reports</h3>
                 <p className="text-gray-500 text-sm">View analytics & export</p>
               </motion.button>
