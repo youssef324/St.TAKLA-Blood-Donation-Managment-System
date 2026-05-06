@@ -72,15 +72,6 @@ Integrated with the **Meta Business API** for large-scale donor mobilization.
 
 ---
 
-## 🚀 Future Roadmap (Vision)
-
-The St. Takla system is designed for continuous evolution:
-- **📊 Advanced Analytics**: Predictive modeling to forecast blood stock levels based on historical session attendance.
-- **🏥 Multi-Church Integration**: Scaling the platform to support multiple branches or churches with centralized data.
-- **📲 Donor Mobile Portal**: A personal app for donors to track their own history, Hb levels, and next eligibility date.
-- **📍 Mobile Clinic Mapping**: Heatmaps of donor density to decide the best locations for mobile donation trucks.
-
----
 
 ## 🎨 Design Philosophy
 The system follows a **Premium Medical Aesthetic**:
